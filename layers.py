@@ -76,7 +76,7 @@ class NeuralNetwork():
 		print(self.layer2.synaptic_weights)
 
 #Seed the random number generator
-random.seed(1)
+np.random.seed(1)
 
 # Create layer 1 (4 neurons, each with 3 inputs)
 layer1 = NeuronLayer(4, 3)
@@ -92,8 +92,8 @@ neural_network.print_weights()
 
 # The training set. We have 7 examples, each consisting of 3 input values
 # and 1 output value.
-training_set_inputs = array([[0, 0, 1], [0, 1, 1], [1, 0, 1], [0, 1, 0], [1, 0, 0], [1, 1, 1], [0, 0, 0]])
-training_set_outputs = array([[0, 1, 1, 1, 1, 0, 0]]).T
+training_set_inputs = np.array([[0, 0, 1], [0, 1, 1], [1, 0, 1], [0, 1, 0], [1, 0, 0], [1, 1, 1], [0, 0, 0]])
+training_set_outputs = np.array([[0, 1, 1, 1, 1, 0, 0]]).T
 
 # Train the neural network using the training set.
 # Do it 60,000 times and make small adjustments each time.
@@ -104,5 +104,5 @@ neural_network.print_weights()
 
 # Test the neural network with a new situation.
 print("Stage 3) Predicting a new situation [1, 1, 0]: ")
-hidden_state, output = neural_network.think(array([1, 1, 0]))
+hidden_state, output = neural_network.calculate(np.array([1, 1, 0]))
 print(output)
