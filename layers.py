@@ -1,34 +1,30 @@
 import numpy as np
 
-""" Neural Network Logic
-1. take inputs from a training set, adjust by weights, pass them through formula to calculate neuron's output
-2. calculate error -- difference between neuron's output and desired output in training set example
-3. adjust weights based on direction of error
-4. repeat process 10,000 times
+""" 
+Vinitra Swamy
+1/1/17
 
-Neuron's output is weighted sum of inputs
-- sigmoid function used to normalize results to between 0 and 1
-Output formula = 1/(1 + e^(negative weighted sum of inputs))
+	Multilayer NeuralNetwork
+	- often, a single neuron is not adept to handling more complicated cases
+	- namely, nonlinear relationships -- if there is not a direct one-to-one relationship between inputs and outputs
 
-Weight adjustment function is proportional to error, boolean input, gradient of sigmoid function
-- reason for this is that we used sigmoid curve to calculate output of the neuron
-- at large numbers, sigmoid curve has a shallow gradient, meaning we don't want to adjust it too much
-- gradient of sigmoid curve is just output*(1-output)
-Adjustment formula = error * input * output * (1 - output)
+	Solution: create an additional hidden layer!
+	- in this case, we'll create a layer of four neurons that enables neural net to think about combinations of inputs
+	- adding more hidden layers is a process called deep learning
 
-Eventually weights reach an optimum for training set
-Propogation: allowing the neuron to predict for a new situation
+	Very useful for image recognition:
+	- no direct relationship between pixels and bananas, but direct relation between combinations of pixels and bananas
 """
 
-class NeuralNetwork():
-	def __init__(self):
-		# choose a fixed random seed, so the rng generates the same numbers
-		# every time the program runs
-		np.random.seed(17)
+class NeuronLayer():
+	def __init__(self, num_neurons, num_inputs):
+		# num_inputs corresponds to the number of inputs for each neuron
+		self.synaptic_weights = 2 * np.random.random((num_inputs, num_neurons)) - 1
 
-		# model of a single neuron with 3 inputs and 1 output
-		# assigning random weights to 3 x 1 matrix from -1 to 1, mean = 0
-		self.synaptic_weights = 2 * np.random.random((3,1)) - 1
+class NeuralNetwork():
+	def __init__(self, layer1, layer2):
+		self.layer1 = layer1
+		self.layer2 = layer2
 
 	def sigmoid(self, x):
 		"""Sigmoid Function: pass in the weighted sum of inputs 
@@ -45,40 +41,68 @@ class NeuralNetwork():
 		""" Train the neural network by trial and error, adjusting 
 		synaptic_weights each time"""
 		for iteration in np.arange(num_iterations):
-			# pass training set through NeuralNetwork
-			output = self.calculate(training_inputs)
+			# pass training set through NeuralNetwork to get layer 1 and 2 outputs
+			output_l1, output_l2 = self.calculate(training_inputs)
 
-			# calculate error (difference between desired output 
+			# calculate error for layer 2 (difference between desired output 
 			# and predicted output)
-			error = training_outputs - output
+			l2_error = training_outputs - output_l2
+			l2_delta = l2_error * self.sigmoid_derivative(output_l2)
+
+			# calculate error for layer 1 (by looking at layer 1 
+			# weights, we can find how much layer 1 contributed to layer 2 error)
+			l1_error = l2_delta.dot(self.layer2.synaptic_weights.T)  # dot product of weights from transformed layer 2
+			l1_delta = l1_error * self.sigmoid_derivative(output_l1)
 
 			# multiply error by input and gradient of the Sigmoid curve
 			# less confident weights adjusted more, zero inputs don't cause change to weights
-			adjustment = np.dot(training_inputs.T, error * self.sigmoid_derivative(output))
+			l1_adjustment = training_inputs.T.dot(l1_delta)
+			l2_adjustment = output_l1.T.dot(l2_delta)
 
-			# adjust weights
-			self.synaptic_weights += adjustment
+			# adjust weights for multiple layers
+			self.layer1.synaptic_weights += l1_adjustment
+			self.layer2.synaptic_weights += l2_adjustment
 
 	def calculate(self, inputs):
 		"""Pass inputs through neural network"""
-		return self.sigmoid(np.dot(inputs, self.synaptic_weights))
+		output_l1 = self.sigmoid(np.dot(inputs, self.layer1.synaptic_weights))
+		output_l2 = self.sigmoid(np.dot(output_l1, self.layer2.synaptic_weights))
+		return output_l1, output_l2
 
-# Initialize single neuron neural network
-neural_network = NeuralNetwork()
+	def print_weights(self):
+		print("Layer 1 (4 neurons, 3 inputs each): ")
+		print(self.layer1.synaptic_weights)
+		print("Layer 2 (2 neuron, 4 inputs): ")
+		print(self.layer2.synaptic_weights)
 
-print("Randomly initialized synaptic_weights:")
-print(neural_network.synaptic_weights)
+#Seed the random number generator
+random.seed(1)
 
-# Training set, 4 sets of inputs/outputs
-training_inputs = np.array([[0, 0, 1], [1, 1, 1], [1, 0, 1], [0, 1, 1]])
-training_outputs = np.array([[0, 1, 1, 0]]).T
+# Create layer 1 (4 neurons, each with 3 inputs)
+layer1 = NeuronLayer(4, 3)
 
-# Train the neural network using training set, 10000 iterations
-neural_network.train(training_inputs, training_outputs, 10000)
+# Create layer 2 (2 neurons, each with 4 inputs)
+layer2 = NeuronLayer(2, 4)
 
-print("New synaptic_weights after training:")
-print(neural_network.synaptic_weights)
+# Combine the layers to create a neural network
+neural_network = NeuralNetwork(layer1, layer2)
 
-# Test neural network with a new situation
-print("Considering situation [1, 0, 0]:")
-print(neural_network.calculate(np.array([1, 0, 0])))
+print("Stage 1) Random starting synaptic weights: ")
+neural_network.print_weights()
+
+# The training set. We have 7 examples, each consisting of 3 input values
+# and 1 output value.
+training_set_inputs = array([[0, 0, 1], [0, 1, 1], [1, 0, 1], [0, 1, 0], [1, 0, 0], [1, 1, 1], [0, 0, 0]])
+training_set_outputs = array([[0, 1, 1, 1, 1, 0, 0]]).T
+
+# Train the neural network using the training set.
+# Do it 60,000 times and make small adjustments each time.
+neural_network.train(training_set_inputs, training_set_outputs, 60000)
+
+print("Stage 2) New synaptic weights after training: ")
+neural_network.print_weights()
+
+# Test the neural network with a new situation.
+print("Stage 3) Predicting a new situation [1, 1, 0]: ")
+hidden_state, output = neural_network.think(array([1, 1, 0]))
+print(output)

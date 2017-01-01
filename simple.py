@@ -1,23 +1,27 @@
 import numpy as np
 
-""" Neural Network Logic
-1. take inputs from a training set, adjust by weights, pass them through formula to calculate neuron's output
-2. calculate error -- difference between neuron's output and desired output in training set example
-3. adjust weights based on direction of error
-4. repeat process 10,000 times
+""" 
+Vinitra Swamy
+12/31/16
 
-Neuron's output is weighted sum of inputs
-- sigmoid function used to normalize results to between 0 and 1
-Output formula = 1/(1 + e^(negative weighted sum of inputs))
+	Neural Network Logic
+	1. take inputs from a training set, adjust by weights, pass them through formula to calculate neuron's output
+	2. calculate error -- difference between neuron's output and desired output in training set example
+	3. adjust weights based on direction of error
+	4. repeat process 10,000 times
 
-Weight adjustment function is proportional to error, boolean input, gradient of sigmoid function
-- reason for this is that we used sigmoid curve to calculate output of the neuron
-- at large numbers, sigmoid curve has a shallow gradient, meaning we don't want to adjust it too much
-- gradient of sigmoid curve is just output*(1-output)
-Adjustment formula = error * input * output * (1 - output)
+	Neuron's output is weighted sum of inputs
+	- sigmoid function used to normalize results to between 0 and 1
+	Output formula = 1/(1 + e^(negative weighted sum of inputs))
 
-Eventually weights reach an optimum for training set
-Propogation: allowing the neuron to predict for a new situation
+	Weight adjustment function is proportional to error, boolean input, gradient of sigmoid function
+	- reason for this is that we used sigmoid curve to calculate output of the neuron
+	- at large numbers, sigmoid curve has a shallow gradient, meaning we don't want to adjust it too much
+	- gradient of sigmoid curve is just output*(1-output)
+	Adjustment formula = error * input * output * (1 - output)
+
+	Eventually weights reach an optimum for training set
+	Propogation: allowing the neuron to predict for a new situation
 """
 
 class NeuralNetwork():
