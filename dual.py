@@ -22,9 +22,9 @@ class NeuronLayer():
 		self.synaptic_weights = 2 * np.random.random((num_inputs, num_neurons)) - 1
 
 class NeuralNetwork():
-	def __init__(self, layers, num_layers):
-		self.layers = layers
-		self.num_layers = num_layers
+	def __init__(self, layer1, layer2):
+		self.layer1 = layer1
+		self.layer2 = layer2
 
 	def sigmoid(self, x):
 		"""Sigmoid Function: pass in the weighted sum of inputs 
@@ -41,36 +41,18 @@ class NeuralNetwork():
 		""" Train the neural network by trial and error, adjusting 
 		synaptic_weights each time"""
 		for iteration in np.arange(num_iterations):
-			# pass training set through NeuralNetwork to get layer outputs
-			outputs = self.calculate(training_inputs)
-			errors = []
-			deltas = []
+			# pass training set through NeuralNetwork to get layer 1 and 2 outputs
+			output_l1, output_l2 = self.calculate(training_inputs)
 
-			# calculate error for final layer (difference between desired output 
+			# calculate error for layer 2 (difference between desired output 
 			# and predicted output)
-			last_layer_output = outputs[-1]
-			last_layer_error = training_outputs - last_layer_output
-			last_layer_delta = last_layer_error * last_layer_output
-
-			errors.append(last_layer_error)
-			deltas.append(last_layer_delta)
-
-			# l2_error = training_outputs - output_l2
-			# l2_delta = l2_error * self.sigmoid_derivative(output_l2)
-
-			for i in np.arange(self.num_layers - 1):
-				curr_layer_error = deltas[i - 1].dot(self.layers[i + 1].synaptic_weights.T)
-				curr_layer_delta = curr_layer_error * self.sigmoid_derivative(outputs[i])
-				deltas.append()
-				errors.append(curr_layer_error)
-
-	
-
+			l2_error = training_outputs - output_l2
+			l2_delta = l2_error * self.sigmoid_derivative(output_l2)
 
 			# calculate error for layer 1 (by looking at layer 1 
 			# weights, we can find how much layer 1 contributed to layer 2 error)
 			l1_error = l2_delta.dot(self.layer2.synaptic_weights.T)  # dot product of weights from transformed layer 2
-			l1_delta = l1_error * self.sigmoid_derivative(outputs_l1)
+			l1_delta = l1_error * self.sigmoid_derivative(output_l1)
 
 			# multiply error by input and gradient of the Sigmoid curve
 			# less confident weights adjusted more, zero inputs don't cause change to weights
